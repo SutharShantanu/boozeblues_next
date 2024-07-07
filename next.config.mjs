@@ -1,7 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    images:{
-
-}};
+    reactStrictMode: false,
+    images: {
+        domains: ["content.gotoliquorstore.com"],
+    },
+};
 
 export default nextConfig;
