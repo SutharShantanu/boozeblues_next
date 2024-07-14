@@ -16,10 +16,13 @@ import {
   SimpleGrid,
   InputGroup,
   InputRightElement,
+  IconButton,
 } from "@chakra-ui/react";
 import { CheckCircleIcon, ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 import Link from "next/link";
-import { CircleArrowUp } from "lucide-react";
+import { ArrowRight, CircleArrowUp, Loader, MoveRight } from "lucide-react";
 
 const initialValues = {
   fullName: "",
@@ -34,14 +37,16 @@ const initialValues = {
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordMatch, setPasswordMatch] = useState(false);
   const [values, setValues] = useState(initialValues);
   const [touched, setTouched] = useState({});
-  const [passwordMatch, setPasswordMatch] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const router = useRouter()
 
   const onBlur = (fieldName) => {
     setTouched((prev) => ({ ...prev, [fieldName]: true }));
 
-    // Handle validation errors on blur
     if (fieldName === "password" || fieldName === "confirmPassword") {
       setValues((prev) => ({
         ...prev,
@@ -93,11 +98,27 @@ const SignUp = () => {
     return regex.test(password);
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-
+    setIsLoading(true);
     console.log("Form submitted with values:", values);
+
+    try {
+      const response = await axios.post("api/user/signup", values);
+      setIsLoading(false);
+      setValues(initialValues);
+      if (response.status === 200) {
+        router.push("/");
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.log(`error from catch`, error);
+
+    } finally {
+      setIsLoading(false);
+    }
   };
+
 
   return (
     <Flex minH="100vh" align="center" justify="center" bg="gray.50">
@@ -137,6 +158,7 @@ const SignUp = () => {
                   <Input
                     id="phoneNumber"
                     name="phoneNumber"
+                    errorBorderColor="red.300"
                     placeholder="+91 00000-00000"
                     value={values.phoneNumber}
                     onChange={handleChange}
@@ -144,7 +166,6 @@ const SignUp = () => {
                     minLength={10}
                     maxLength={10}
                   />
-
                   <FormErrorMessage fontSize={"small"}>Enter a valid number</FormErrorMessage>
                 </FormControl>
               </SimpleGrid>
@@ -158,6 +179,7 @@ const SignUp = () => {
                   id="email"
                   name="email"
                   type="email"
+                  errorBorderColor="red.300"
                   placeholder="markspector@email.com"
                   value={values.email}
                   onChange={handleChange}
@@ -176,6 +198,7 @@ const SignUp = () => {
                     <Input
                       id="password"
                       name="password"
+                      errorBorderColor="red.300"
                       type={showPassword ? "text" : "password"}
                       placeholder="Password"
                       value={values.password}
@@ -183,7 +206,7 @@ const SignUp = () => {
                       onBlur={() => onBlur("password")}
                     />
                     <InputRightElement>
-                      <Button
+                      <IconButton
                         variant={"ghost"}
                         borderWidth={2}
                         p={0}
@@ -192,7 +215,7 @@ const SignUp = () => {
                         onClick={() => setShowPassword((prev) => !prev)}
                       >
                         {showPassword ? <ViewIcon /> : <ViewOffIcon />}
-                      </Button>
+                      </IconButton>
                     </InputRightElement>
                   </InputGroup>
                   <FormErrorMessage>{values.passwordError}</FormErrorMessage>
@@ -213,6 +236,7 @@ const SignUp = () => {
                     <Input
                       id="confirmPassword"
                       name="confirmPassword"
+                      errorBorderColor="red.300"
                       type={showConfirmPassword ? "text" : "password"}
                       placeholder="Confirm Password"
                       value={values.confirmPassword}
@@ -228,7 +252,7 @@ const SignUp = () => {
                       }
                     />
                     <InputRightElement h={"full"}>
-                      <Button
+                      <IconButton
                         variant={"ghost"}
                         borderWidth={2}
                         p={0}
@@ -237,7 +261,7 @@ const SignUp = () => {
                         onClick={() => setShowConfirmPassword((prev) => !prev)}
                       >
                         {showConfirmPassword ? <ViewIcon /> : <ViewOffIcon />}
-                      </Button>
+                      </IconButton>
                     </InputRightElement>
                   </InputGroup>
                   <FormErrorMessage fontSize={"small"}>Password Required</FormErrorMessage>
@@ -271,13 +295,59 @@ const SignUp = () => {
               </Checkbox>
               <Button
                 type="submit"
-                bg={"blue.400"}
-                color={"white"}
-                _hover={{ bg: "blue.500" }}
+                bg={"gray.800"}
+                color={"gray.50"}
+                _hover={{
+                  bg: "gray.700",
+                }}
+                isLoading={isLoading}
+                loadingText="Signing up"
+                className="group"
+                isDisabled={
+                  !values.fullName ||
+                  !values.phoneNumber ||
+                  !values.email ||
+                  !values.password ||
+                  !values.confirmPassword ||
+                  !values.terms ||
+                  !values.ageConfirmation
+                }
               >
-                Sign Up
+                {isLoading ? (
+                  <Loader size={16} strokeWidth={1.2} absoluteStrokeWidth />
+                ) : (
+                  <Flex alignItems={"start"}>
+                    Sign up
+                    <MoveRight
+                      size={20}
+                      strokeWidth={3}
+                      absoluteStrokeWidth
+                      className="transition-all duration-300 ease-in-out w-0 group-hover:w-10"
+                    />
+                  </Flex>
+                )}
               </Button>
+
             </Stack>
+            <Flex pt={4} mx={"auto"} justify="center">
+              <Text as={"span"} display="flex" alignItems="center">
+                Already a user?
+                <Link
+                  href="/login"
+                  className="flex items-center text-blue-600 group mx-1 border-b border-transparent hover:border-blue-600 transition-all ease-in-out"
+                >
+                  <span className="mr-1 ">
+                    Login
+                  </span>
+                  <CircleArrowUp
+                    size={16}
+                    strokeWidth={1.2}
+                    absoluteStrokeWidth
+                    className="rotate-45 group-hover:rotate-90 transition-all ease-in-out"
+                  />
+                </Link>
+              </Text>
+            </Flex>
           </form>
         </Stack>
       </Box>

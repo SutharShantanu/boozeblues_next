@@ -19,6 +19,7 @@ export default function RootLayout({ children }) {
           <Navbar />
           <body className={`${inter.className} mt-[82px]`}>
             {/* <div className="min-h-[91vh] border-4 border-yellow-800"> */}
+            
                 {children}
             {/* </div> */}
           </body>
