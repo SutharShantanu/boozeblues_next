@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import React, { useReducer, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -19,124 +19,64 @@ import {
   InputRightElement,
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import { CheckCircleIcon } from "lucide-react";
 
-// Initial state for the form
-const initialState = {
+const initialValues = {
   fullName: "",
   email: "",
   password: "",
   confirmPassword: "",
   phoneNumber: "",
-  streetAddress: "",
-  city: "",
-  state: "",
-  postalCode: "",
-  country: "",
   terms: false,
   ageConfirmation: false,
-  errors: {},
-};
-
-// Reducer function to handle state updates
-const reducer = (state, action) => {
-  switch (action.type) {
-    case "CHANGE":
-      return {
-        ...state,
-        [action.field]: action.value,
-      };
-    case "VALIDATE":
-      return {
-        ...state,
-        errors: action.errors,
-      };
-    default:
-      return state;
-  }
 };
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [values, setValues] = useState(initialValues);
+  const [touched, setTouched] = useState({});
+  const [passwordMatch, setPasswordMatch] = useState(true);
 
-  // Function to handle form field changes
+  const onBlur = (fieldName) =>
+    setTouched((prev) => ({ ...prev, [fieldName]: true }));
+
   const handleChange = (e) => {
-    const { id, value, type, checked } = e.target;
-    dispatch({
-      type: "CHANGE",
-      field: id,
-      value: type === "checkbox" ? checked : value,
-    });
+    const { name, value } = e.target;
+    setValues((prev) => ({
+      ...prev,
+      [name]: value,
+      emailError:
+        name === "email" && !isValidEmail(value)
+          ? "Invalid email address"
+          : undefined,
+      passwordError:
+        name === "password" && !isValidPassword(value)
+          ? "Password must be at least 6 characters including one symbol and one number"
+          : undefined,
+    }));
+
+    if (name === "password" || name === "confirmPassword") {
+      setPasswordMatch(
+        values.password === value || values.confirmPassword === value
+      );
+    }
   };
 
-  // Function to validate the form
-  const validateForm = () => {
-    const {
-      fullName,
-      email,
-      password,
-      confirmPassword,
-      phoneNumber,
-      streetAddress,
-      city,
-      state,
-      postalCode,
-      country,
-      ageConfirmation,
-      terms,
-    } = state;
-
-    const errors = {};
-
-    if (!fullName.trim()) {
-      errors.fullName = "Full name is required";
-    }
-    if (!email.trim()) {
-      errors.email = "Email is required";
-    } else if (
-      !/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(email)
-    ) {
-      errors.email = "Invalid email address";
-    }
-    if (!password.trim()) {
-      errors.password = "Password is required";
-    } else if (password.length < 6) {
-      errors.password = "Password should be at least 6 characters";
-    }
-    if (password !== confirmPassword) {
-      errors.confirmPassword = "Passwords do not match";
-    }
-    if (!ageConfirmation) {
-      errors.ageConfirmation = "You must confirm you are 18 years or older";
-    }
-    if (!terms) {
-      errors.terms = "You must agree to the terms and conditions";
-    }
-
-    dispatch({ type: "VALIDATE", errors });
-    return errors;
+  const isValidEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
   };
 
-  // Function to handle form submission
-  const handleSubmit = (e) => {
+  const isValidPassword = (password) => {
+    const regex =
+      /^(?=.*[0-9])(?=.*[!@#$%^&*()_\-+=])[a-zA-Z0-9!@#$%^&*()_\-+=]{6,}$/;
+    return regex.test(password);
+  };
+
+  const onSubmit = (e) => {
     e.preventDefault();
-    const errors = validateForm();
-    if (Object.keys(errors).length === 0) {
-      // Handle form submission logic here
-      alert(JSON.stringify(state, null, 2));
-      // Example: Make API call or perform other actions
-    }
+    console.log("Form submitted with values:", values);
   };
-
-  const { errors } = state;
-
-  // Check if both checkboxes are checked
-  const isFormValid =
-    state.ageConfirmation && state.terms && // Checkboxes are checked
-    state.fullName.trim() !== "" &&
-    state.email.trim() !== "" &&
-    state.password.trim() !== "" &&
-    state.confirmPassword.trim() !== ""; // Other fields are filled
 
   return (
     <Flex minH="100vh" align="center" justify="center" bg="gray.50">
@@ -148,57 +88,92 @@ const SignUp = () => {
               to enjoy all of our cool features ✌️
             </Text>
           </Stack>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={onSubmit}>
+            {" "}
+            {/* Added onSubmit handler to the form */}
             <Stack spacing={4}>
               <SimpleGrid columns={2} spacing={4}>
-                <FormControl isInvalid={errors.fullName} id="fullName"
-                  isRequired>
+                <FormControl
+                  id="fullName"
+                  isRequired
+                  isInvalid={touched.fullName && !values.fullName}
+                >
                   <FormLabel htmlFor="fullName">Full Name</FormLabel>
                   <Input
                     id="fullName"
+                    name="fullName"
+                    errorBorderColor="red.300"
                     placeholder="Full Name"
-                    value={state.fullName}
+                    value={values.fullName}
                     onChange={handleChange}
+                    onBlur={() => onBlur("fullName")}
                   />
-                  <FormErrorMessage>{errors.fullName}</FormErrorMessage>
+                  <FormErrorMessage>Required</FormErrorMessage>
                 </FormControl>
-                <FormControl isInvalid={errors.phoneNumber} >
+                <FormControl
+                  id="phoneNumber"
+                  isInvalid={touched.phoneNumber && !values.phoneNumber}
+                >
                   <FormLabel htmlFor="phoneNumber">Phone Number</FormLabel>
                   <Input
                     id="phoneNumber"
+                    name="phoneNumber"
                     placeholder="Phone Number"
-                    value={state.phoneNumber}
+                    value={values.phoneNumber}
                     onChange={handleChange}
+                    onBlur={() => onBlur("phoneNumber")}
+                    minLength={10}
+                    maxLength={10}
                   />
-                  <FormErrorMessage>{errors.phoneNumber}</FormErrorMessage>
+
+                  <FormErrorMessage>Required</FormErrorMessage>
                 </FormControl>
               </SimpleGrid>
-              <FormControl isInvalid={errors.email} id="email"
-                  isRequired>
+              <FormControl
+                id="email"
+                isRequired
+                isInvalid={
+                  touched.email && (!!values.emailError || !values.email)
+                }
+              >
                 <FormLabel htmlFor="email">Email Address</FormLabel>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
                   placeholder="Email Address"
-                  value={state.email}
+                  value={values.email}
                   onChange={handleChange}
+                  onBlur={() => onBlur("email")}
                 />
-                <FormErrorMessage>{errors.email}</FormErrorMessage>
+                <FormErrorMessage>{values.emailError}</FormErrorMessage>
               </FormControl>
               <SimpleGrid columns={2} spacing={4}>
                 <FormControl
-                  isInvalid={errors.password}
                   id="password"
                   isRequired
+                  isInvalid={
+                    touched.password &&
+                    (!!values.passwordError || !values.password)
+                  }
                 >
                   <FormLabel htmlFor="password">Password</FormLabel>
                   <InputGroup>
                     <Input
                       id="password"
+                      name="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="Password"
-                      value={state.password}
+                      value={values.password}
                       onChange={handleChange}
+                      onBlur={() => onBlur("password")}
+                      borderColor={
+                        touched.password &&
+                        touched.confirmPassword &&
+                        passwordMatch
+                          ? "green.400"
+                          : "inherit"
+                      }
                     />
                     <InputRightElement h={"full"}>
                       <Button
@@ -209,43 +184,68 @@ const SignUp = () => {
                       </Button>
                     </InputRightElement>
                   </InputGroup>
-                  <FormErrorMessage>{errors.password}</FormErrorMessage>
+                  <FormErrorMessage>{values.passwordError}</FormErrorMessage>
                 </FormControl>
-                <FormControl isInvalid={errors.confirmPassword}>
+                <FormControl
+                  id="confirmPassword"
+                  isInvalid={touched.confirmPassword && !values.confirmPassword}
+                >
                   <FormLabel htmlFor="confirmPassword">
                     Confirm Password
                   </FormLabel>
                   <Input
                     id="confirmPassword"
+                    name="confirmPassword"
                     type="password"
                     placeholder="Confirm Password"
-                    value={state.confirmPassword}
+                    value={values.confirmPassword}
                     onChange={handleChange}
+                    onBlur={() => onBlur("confirmPassword")}
+                    borderColor={
+                      touched.password &&
+                      touched.confirmPassword &&
+                      passwordMatch
+                        ? "green.400"
+                        : "inherit"
+                    }
                   />
-                  <FormErrorMessage>{errors.confirmPassword}</FormErrorMessage>
+                  <FormErrorMessage>Required</FormErrorMessage>
                 </FormControl>
+                <Text textColor={"green.300"} fontSize={"x-small"}>
+                  <CheckCircleIcon />
+                  {passwordMatch && "Password matched!"}
+                </Text>
               </SimpleGrid>
               <Checkbox
                 id="ageConfirmation"
-                isChecked={state.ageConfirmation}
+                name="ageConfirmation"
+                isChecked={values.ageConfirmation}
                 onChange={handleChange}
+                onBlur={() => onBlur("ageConfirmation")}
               >
                 I confirm that I am 18 years or older
               </Checkbox>
-              <FormErrorMessage>{errors.ageConfirmation}</FormErrorMessage>
               <Checkbox
                 id="terms"
-                isChecked={state.terms}
+                name="terms"
+                isChecked={values.terms}
                 onChange={handleChange}
+                onBlur={() => onBlur("terms")}
               >
                 I agree to the Terms and Conditions
               </Checkbox>
-              <FormErrorMessage>{errors.terms}</FormErrorMessage>
               <Button
                 mt={4}
                 colorScheme="blue"
                 type="submit"
-                isDisabled={!isFormValid}
+                isDisabled={
+                  !values.fullName ||
+                  !values.email ||
+                  !values.password ||
+                  !values.confirmPassword ||
+                  !values.terms ||
+                  !values.ageConfirmation
+                }
               >
                 Sign up
               </Button>

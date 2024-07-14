@@ -12,7 +12,6 @@ import {
   InputRightElement,
 } from "@chakra-ui/react";
 import { SearchIcon, ArrowForwardIcon } from "@chakra-ui/icons";
-import { CiHeart, CiShoppingCart, CiDeliveryTruck } from "react-icons/ci";
 import { Heart, House, Package, ShoppingCart, Truck } from "lucide-react";
 
 const Navbar = () => {
