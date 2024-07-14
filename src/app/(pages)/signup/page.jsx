@@ -12,14 +12,14 @@ import {
   Stack,
   Heading,
   Text,
-  Link,
   Flex,
   SimpleGrid,
   InputGroup,
   InputRightElement,
 } from "@chakra-ui/react";
-import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
-import { CheckCircleIcon } from "lucide-react";
+import { CheckCircleIcon, ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import Link from "next/link";
+import { CircleArrowUp } from "lucide-react";
 
 const initialValues = {
   fullName: "",
@@ -33,18 +33,37 @@ const initialValues = {
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [values, setValues] = useState(initialValues);
   const [touched, setTouched] = useState({});
-  const [passwordMatch, setPasswordMatch] = useState(true);
+  const [passwordMatch, setPasswordMatch] = useState(false);
 
-  const onBlur = (fieldName) =>
+  const onBlur = (fieldName) => {
     setTouched((prev) => ({ ...prev, [fieldName]: true }));
 
+    // Handle validation errors on blur
+    if (fieldName === "password" || fieldName === "confirmPassword") {
+      setValues((prev) => ({
+        ...prev,
+        passwordError:
+          fieldName === "password" && !isValidPassword(values.password)
+            ? "Password must be at least 6 characters including one symbol and one number"
+            : undefined,
+      }));
+      setPasswordMatch(
+        isValidPassword(values.password) &&
+        (fieldName === "password"
+          ? values.password === values.confirmPassword
+          : values.password === values.confirmPassword)
+      );
+    }
+  };
+
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setValues((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: type === "checkbox" ? checked : value,
       emailError:
         name === "email" && !isValidEmail(value)
           ? "Invalid email address"
@@ -57,7 +76,8 @@ const SignUp = () => {
 
     if (name === "password" || name === "confirmPassword") {
       setPasswordMatch(
-        values.password === value || values.confirmPassword === value
+        isValidPassword(values.password) &&
+        (name === "password" ? value === values.confirmPassword : values.password === value)
       );
     }
   };
@@ -75,6 +95,7 @@ const SignUp = () => {
 
   const onSubmit = (e) => {
     e.preventDefault();
+
     console.log("Form submitted with values:", values);
   };
 
@@ -83,14 +104,12 @@ const SignUp = () => {
       <Box bg="white" p={8} borderRadius="lg" boxShadow="lg" w="full" maxW="lg">
         <Stack spacing={4}>
           <Stack align="center">
-            <Heading fontSize="2xl">Sign up</Heading>
+            <Heading fontSize="2xl">Sign up at Boozeblues</Heading>
             <Text fontSize="md" color="gray.600">
-              to enjoy all of our cool features ✌️
+              Buy variety of liquar online ✌️
             </Text>
           </Stack>
           <form onSubmit={onSubmit}>
-            {" "}
-            {/* Added onSubmit handler to the form */}
             <Stack spacing={4}>
               <SimpleGrid columns={2} spacing={4}>
                 <FormControl
@@ -103,12 +122,12 @@ const SignUp = () => {
                     id="fullName"
                     name="fullName"
                     errorBorderColor="red.300"
-                    placeholder="Full Name"
+                    placeholder="Mark Spector"
                     value={values.fullName}
                     onChange={handleChange}
                     onBlur={() => onBlur("fullName")}
                   />
-                  <FormErrorMessage>Required</FormErrorMessage>
+                  <FormErrorMessage fontSize={"small"}>Enter your full name</FormErrorMessage>
                 </FormControl>
                 <FormControl
                   id="phoneNumber"
@@ -118,7 +137,7 @@ const SignUp = () => {
                   <Input
                     id="phoneNumber"
                     name="phoneNumber"
-                    placeholder="Phone Number"
+                    placeholder="+91 00000-00000"
                     value={values.phoneNumber}
                     onChange={handleChange}
                     onBlur={() => onBlur("phoneNumber")}
@@ -126,22 +145,20 @@ const SignUp = () => {
                     maxLength={10}
                   />
 
-                  <FormErrorMessage>Required</FormErrorMessage>
+                  <FormErrorMessage fontSize={"small"}>Enter a valid number</FormErrorMessage>
                 </FormControl>
               </SimpleGrid>
               <FormControl
                 id="email"
                 isRequired
-                isInvalid={
-                  touched.email && (!!values.emailError || !values.email)
-                }
+                isInvalid={touched.email && (!!values.emailError || !isValidEmail(values.email))}
               >
                 <FormLabel htmlFor="email">Email Address</FormLabel>
                 <Input
                   id="email"
                   name="email"
                   type="email"
-                  placeholder="Email Address"
+                  placeholder="markspector@email.com"
                   value={values.email}
                   onChange={handleChange}
                   onBlur={() => onBlur("email")}
@@ -152,10 +169,7 @@ const SignUp = () => {
                 <FormControl
                   id="password"
                   isRequired
-                  isInvalid={
-                    touched.password &&
-                    (!!values.passwordError || !values.password)
-                  }
+                  isInvalid={touched.password && (!!values.passwordError || !isValidPassword(values.password))}
                 >
                   <FormLabel htmlFor="password">Password</FormLabel>
                   <InputGroup>
@@ -167,17 +181,14 @@ const SignUp = () => {
                       value={values.password}
                       onChange={handleChange}
                       onBlur={() => onBlur("password")}
-                      borderColor={
-                        touched.password &&
-                        touched.confirmPassword &&
-                        passwordMatch
-                          ? "green.400"
-                          : "inherit"
-                      }
                     />
-                    <InputRightElement h={"full"}>
+                    <InputRightElement>
                       <Button
                         variant={"ghost"}
+                        borderWidth={2}
+                        p={0}
+                        size={"sm"}
+                        rounded={"full"}
                         onClick={() => setShowPassword((prev) => !prev)}
                       >
                         {showPassword ? <ViewIcon /> : <ViewOffIcon />}
@@ -188,32 +199,56 @@ const SignUp = () => {
                 </FormControl>
                 <FormControl
                   id="confirmPassword"
-                  isInvalid={touched.confirmPassword && !values.confirmPassword}
+                  isRequired
+                  isInvalid={
+                    touched.confirmPassword &&
+                    (!values.confirmPassword || !passwordMatch)
+                  }
                 >
                   <FormLabel htmlFor="confirmPassword">
                     Confirm Password
                   </FormLabel>
-                  <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    placeholder="Confirm Password"
-                    value={values.confirmPassword}
-                    onChange={handleChange}
-                    onBlur={() => onBlur("confirmPassword")}
-                    borderColor={
-                      touched.password &&
-                      touched.confirmPassword &&
-                      passwordMatch
-                        ? "green.400"
-                        : "inherit"
-                    }
-                  />
-                  <FormErrorMessage>Required</FormErrorMessage>
+                  <InputGroup>
+
+                    <Input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="Confirm Password"
+                      value={values.confirmPassword}
+                      onChange={handleChange}
+                      onBlur={() => onBlur("confirmPassword")}
+                      borderColor={
+                        touched.password &&
+                          touched.confirmPassword &&
+                          passwordMatch &&
+                          !values.passwordError
+                          ? "green.400"
+                          : "inherit"
+                      }
+                    />
+                    <InputRightElement h={"full"}>
+                      <Button
+                        variant={"ghost"}
+                        borderWidth={2}
+                        p={0}
+                        size={"sm"}
+                        rounded={"full"}
+                        onClick={() => setShowConfirmPassword((prev) => !prev)}
+                      >
+                        {showConfirmPassword ? <ViewIcon /> : <ViewOffIcon />}
+                      </Button>
+                    </InputRightElement>
+                  </InputGroup>
+                  <FormErrorMessage fontSize={"small"}>Password Required</FormErrorMessage>
                 </FormControl>
-                <Text textColor={"green.300"} fontSize={"x-small"}>
-                  <CheckCircleIcon />
-                  {passwordMatch && "Password matched!"}
+                <Text textColor={"green.400"} fontSize={"small"}>
+                  {passwordMatch && !values.passwordError && (
+                    <span className="flex items-center">
+                      <CheckCircleIcon mr={2} />
+                      Password matched!
+                    </span>
+                  )}
                 </Text>
               </SimpleGrid>
               <Checkbox
@@ -232,30 +267,18 @@ const SignUp = () => {
                 onChange={handleChange}
                 onBlur={() => onBlur("terms")}
               >
-                I agree to the Terms and Conditions
+                I accept the terms and conditions
               </Checkbox>
               <Button
-                mt={4}
-                colorScheme="blue"
                 type="submit"
-                isDisabled={
-                  !values.fullName ||
-                  !values.email ||
-                  !values.password ||
-                  !values.confirmPassword ||
-                  !values.terms ||
-                  !values.ageConfirmation
-                }
+                bg={"blue.400"}
+                color={"white"}
+                _hover={{ bg: "blue.500" }}
               >
-                Sign up
+                Sign Up
               </Button>
             </Stack>
           </form>
-          <Stack pt={4}>
-            <Text align="center">
-              Already a user? <Link color="blue.400">Login</Link>
-            </Text>
-          </Stack>
         </Stack>
       </Box>
     </Flex>

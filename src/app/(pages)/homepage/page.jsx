@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 // import FullCarousel from "@/app/components/FullCarousel";
-import DrinkCategory from "@/app/components/DrinkCategory";
+import DrinkCategory from "../../components/DrinkCategory"
 // import CategoryBeerCarousel from "@/app/components/CategoryBeerCarousel";
 // import CategoryWineCarousel from "@/app/components/CategoryWineCarousel";
 // import CategorySpiritCarousel from "@/app/components/CategorySpiritCarousel";
@@ -102,8 +102,8 @@ const Homepage = () => {
                     src="https://content.gotoliquorstore.com/images/landing/app.png"
                     alt=""
                     className="w-2/5"
-                    width={50}
-                    height={50}
+                    width={3000}
+                    height={3000}
                 />
                 <div className="w-2/5 text-left">
                     <h2 className="text-2xl font-semibold my-3">Download the app</h2>
