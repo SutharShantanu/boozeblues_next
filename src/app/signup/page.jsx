@@ -58,9 +58,9 @@ const SignUp = () => {
       }));
       setPasswordMatch(
         isValidPassword(values.password) &&
-          (fieldName === "password"
-            ? values.password === values.confirmPassword
-            : values.password === values.confirmPassword)
+        (fieldName === "password"
+          ? values.password === values.confirmPassword
+          : values.password === values.confirmPassword)
       );
     }
   };
@@ -83,9 +83,9 @@ const SignUp = () => {
     if (name === "password" || name === "confirmPassword") {
       setPasswordMatch(
         isValidPassword(values.password) &&
-          (name === "password"
-            ? value === values.confirmPassword
-            : values.password === value)
+        (name === "password"
+          ? value === values.confirmPassword
+          : values.password === value)
       );
     }
   };
@@ -105,9 +105,9 @@ const SignUp = () => {
     e.preventDefault();
     setIsLoading(true);
     console.log(values);
-  
+
     const { emailError, passwordError, ...filteredValues } = values;
-  
+
     try {
       const response = await axios.post("/api/users/signup", filteredValues);
       setIsLoading(false);
@@ -138,7 +138,7 @@ const SignUp = () => {
       setIsLoading(false);
     }
   };
-  
+
   return (
     <Flex minH="100vh" align="center" justify="center" bg="gray.50">
       <Box bg="white" p={8} borderRadius="lg" boxShadow="lg" w="full" maxW="lg">
@@ -237,9 +237,9 @@ const SignUp = () => {
                       onBlur={() => onBlur("password")}
                       borderColor={
                         touched.password &&
-                        touched.confirmPassword &&
-                        passwordMatch &&
-                        !values.passwordError
+                          touched.confirmPassword &&
+                          passwordMatch &&
+                          !values.passwordError
                           ? "green.400"
                           : "inherit"
                       }
@@ -282,9 +282,9 @@ const SignUp = () => {
                       onBlur={() => onBlur("confirmPassword")}
                       borderColor={
                         touched.password &&
-                        touched.confirmPassword &&
-                        passwordMatch &&
-                        !values.passwordError
+                          touched.confirmPassword &&
+                          passwordMatch &&
+                          !values.passwordError
                           ? "green.400"
                           : "inherit"
                       }
