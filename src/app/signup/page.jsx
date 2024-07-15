@@ -22,7 +22,8 @@ import { CheckCircleIcon, ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import Link from "next/link";
-import { ArrowRight, CircleArrowUp, Loader, MoveRight } from "lucide-react";
+import { CircleArrowUp, Loader, MoveRight } from "lucide-react";
+import { useToast } from "@chakra-ui/react";
 
 const initialValues = {
   fullName: "",
@@ -41,8 +42,8 @@ const SignUp = () => {
   const [values, setValues] = useState(initialValues);
   const [touched, setTouched] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-
-  const router = useRouter()
+  const toast = useToast();
+  const router = useRouter();
 
   const onBlur = (fieldName) => {
     setTouched((prev) => ({ ...prev, [fieldName]: true }));
@@ -57,9 +58,9 @@ const SignUp = () => {
       }));
       setPasswordMatch(
         isValidPassword(values.password) &&
-        (fieldName === "password"
-          ? values.password === values.confirmPassword
-          : values.password === values.confirmPassword)
+          (fieldName === "password"
+            ? values.password === values.confirmPassword
+            : values.password === values.confirmPassword)
       );
     }
   };
@@ -82,7 +83,9 @@ const SignUp = () => {
     if (name === "password" || name === "confirmPassword") {
       setPasswordMatch(
         isValidPassword(values.password) &&
-        (name === "password" ? value === values.confirmPassword : values.password === value)
+          (name === "password"
+            ? value === values.confirmPassword
+            : values.password === value)
       );
     }
   };
@@ -101,25 +104,41 @@ const SignUp = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    console.log("Form submitted with values:", values);
-
+    console.log(values);
+  
+    const { emailError, passwordError, ...filteredValues } = values;
+  
     try {
-      const response = await axios.post("api/user/signup", values);
+      const response = await axios.post("/api/users/signup", filteredValues);
       setIsLoading(false);
       setValues(initialValues);
       if (response.status === 200) {
+        toast({
+          title: "Account Successfully Created",
+          description: "Your account has been successfully created. Welcome aboard!",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+          position: "bottom-right",
+        });
         router.push("/");
       }
     } catch (error) {
       setIsLoading(false);
-      console.log(`error from catch`, error);
-
+      toast({
+        title: "Account Creation Failed",
+        description: error.response?.data || error.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom-right",
+      });
+      console.log(`Error from catch: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
   };
-
-
+  
   return (
     <Flex minH="100vh" align="center" justify="center" bg="gray.50">
       <Box bg="white" p={8} borderRadius="lg" boxShadow="lg" w="full" maxW="lg">
@@ -148,10 +167,13 @@ const SignUp = () => {
                     onChange={handleChange}
                     onBlur={() => onBlur("fullName")}
                   />
-                  <FormErrorMessage fontSize={"small"}>Enter your full name</FormErrorMessage>
+                  <FormErrorMessage fontSize={"small"}>
+                    Enter your full name
+                  </FormErrorMessage>
                 </FormControl>
                 <FormControl
                   id="phoneNumber"
+                  isRequired
                   isInvalid={touched.phoneNumber && !values.phoneNumber}
                 >
                   <FormLabel htmlFor="phoneNumber">Phone Number</FormLabel>
@@ -166,13 +188,18 @@ const SignUp = () => {
                     minLength={10}
                     maxLength={10}
                   />
-                  <FormErrorMessage fontSize={"small"}>Enter a valid number</FormErrorMessage>
+                  <FormErrorMessage fontSize={"small"}>
+                    Enter a valid number
+                  </FormErrorMessage>
                 </FormControl>
               </SimpleGrid>
               <FormControl
                 id="email"
                 isRequired
-                isInvalid={touched.email && (!!values.emailError || !isValidEmail(values.email))}
+                isInvalid={
+                  touched.email &&
+                  (!!values.emailError || !isValidEmail(values.email))
+                }
               >
                 <FormLabel htmlFor="email">Email Address</FormLabel>
                 <Input
@@ -191,7 +218,11 @@ const SignUp = () => {
                 <FormControl
                   id="password"
                   isRequired
-                  isInvalid={touched.password && (!!values.passwordError || !isValidPassword(values.password))}
+                  isInvalid={
+                    touched.password &&
+                    (!!values.passwordError ||
+                      !isValidPassword(values.password))
+                  }
                 >
                   <FormLabel htmlFor="password">Password</FormLabel>
                   <InputGroup>
@@ -204,6 +235,14 @@ const SignUp = () => {
                       value={values.password}
                       onChange={handleChange}
                       onBlur={() => onBlur("password")}
+                      borderColor={
+                        touched.password &&
+                        touched.confirmPassword &&
+                        passwordMatch &&
+                        !values.passwordError
+                          ? "green.400"
+                          : "inherit"
+                      }
                     />
                     <InputRightElement>
                       <IconButton
@@ -232,7 +271,6 @@ const SignUp = () => {
                     Confirm Password
                   </FormLabel>
                   <InputGroup>
-
                     <Input
                       id="confirmPassword"
                       name="confirmPassword"
@@ -244,9 +282,9 @@ const SignUp = () => {
                       onBlur={() => onBlur("confirmPassword")}
                       borderColor={
                         touched.password &&
-                          touched.confirmPassword &&
-                          passwordMatch &&
-                          !values.passwordError
+                        touched.confirmPassword &&
+                        passwordMatch &&
+                        !values.passwordError
                           ? "green.400"
                           : "inherit"
                       }
@@ -264,7 +302,9 @@ const SignUp = () => {
                       </IconButton>
                     </InputRightElement>
                   </InputGroup>
-                  <FormErrorMessage fontSize={"small"}>Password Required</FormErrorMessage>
+                  <FormErrorMessage fontSize={"small"}>
+                    Password Required
+                  </FormErrorMessage>
                 </FormControl>
                 <Text textColor={"green.400"} fontSize={"small"}>
                   {passwordMatch && !values.passwordError && (
@@ -295,10 +335,10 @@ const SignUp = () => {
               </Checkbox>
               <Button
                 type="submit"
-                bg={"gray.800"}
+                bg={"gray.900"}
                 color={"gray.50"}
                 _hover={{
-                  bg: "gray.700",
+                  bg: "gray.800",
                 }}
                 isLoading={isLoading}
                 loadingText="Signing up"
@@ -327,7 +367,6 @@ const SignUp = () => {
                   </Flex>
                 )}
               </Button>
-
             </Stack>
             <Flex pt={4} mx={"auto"} justify="center">
               <Text as={"span"} display="flex" alignItems="center">
@@ -336,9 +375,7 @@ const SignUp = () => {
                   href="/login"
                   className="flex items-center text-blue-600 group mx-1 border-b border-transparent hover:border-blue-600 transition-all ease-in-out"
                 >
-                  <span className="mr-1 ">
-                    Login
-                  </span>
+                  <span className="mr-1 ">Login</span>
                   <CircleArrowUp
                     size={16}
                     strokeWidth={1.2}

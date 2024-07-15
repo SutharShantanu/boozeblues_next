@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 // import FullCarousel from "@/app/components/FullCarousel";
-import DrinkCategory from "../../components/DrinkCategory"
+import DrinkCategory from "../components/DrinkCategory"
 // import CategoryBeerCarousel from "@/app/components/CategoryBeerCarousel";
 // import CategoryWineCarousel from "@/app/components/CategoryWineCarousel";
 // import CategorySpiritCarousel from "@/app/components/CategorySpiritCarousel";

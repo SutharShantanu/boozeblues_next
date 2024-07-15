@@ -4,6 +4,9 @@ const nextConfig = {
     images: {
         domains: ["content.gotoliquorstore.com"],
     },
+    env: {
+        MONGODB_URI: process.env.MONGODB_URI,
+    },
 };
 
 export default nextConfig;

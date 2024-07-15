@@ -1,54 +1,56 @@
 import User from "../../../../models/user";
 import bcrypt from "bcrypt";
-import Connection from "../../../database/config";
-
-Connection();
+import Connection from "../../../../database/config";
 
 export const POST = async (NextRequest, NextResponse) => {
-    try {
-        const body = await NextRequest.json();
-        const {
-            fullName,
-            email,
-            password,
-            confirmPassword,
-            phoneNumber,
-            terms,
-            ageConfirmation,
-        } = body;
+  await Connection();
 
-        if (
-            !fullName ||
-            !email ||
-            !password ||
-            !confirmPassword ||
-            !phoneNumber ||
-            !terms ||
-            !ageConfirmation
-        ) {
-            return new Response(`fileds shouldn't be empty`, { status: 401 });
-        }
+  try {
+    const body = await NextRequest.json();
 
-        const user = await User.findOne({ email });
-        if (user) {
-            return new Response(`user already exist!`, { status: 400 });
-        }
+    const {
+      fullName,
+      email,
+      password,
+      confirmPassword,
+      phoneNumber,
+      terms,
+      ageConfirmation,
+    } = body;
 
-        const hashedPassword = bcrypt.hashSync(password, 4);
-        const newUser = new User({
-            fullName,
-            email,
-            phoneNumber,
-            password: hashedPassword,
-            terms,
-            ageConfirmation,
-        });
-
-        await newUser.save();
-
-        return new Response(`User has been registered`, { status: 200 });
-
-    } catch (error) {
-        return console.log(`error from signup catch`, error);
+    if (
+      !fullName ||
+      !email ||
+      !password ||
+      !confirmPassword ||
+      !phoneNumber ||
+      !terms ||
+      !ageConfirmation
+    ) {
+      return new Response("Fields shouldn't be empty", { status: 401 });
     }
+
+    const user = await User.findOne({ email });
+    if (user) {
+      return new Response("Account Already Exists", { status: 400 });
+    }
+
+    const hashedPassword = bcrypt.hashSync(password, 4);
+    const newUser = new User({
+      fullName,
+      email,
+      phoneNumber,
+      confirmPassword,
+      password: hashedPassword,
+      terms,
+      ageConfirmation,
+    });
+
+    await newUser.save();
+
+    return new Response("User has been registered", { status: 200 });
+  } catch (error) {
+    console.error("Error from signup catch:", error);
+    return new Response("Internal Server Error", { status: 500 });
+  }
 };
