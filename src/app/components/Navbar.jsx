@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Profile from "../components/common/profile";
 
 import {
   Button,
@@ -12,11 +13,25 @@ import {
   InputRightElement,
 } from "@chakra-ui/react";
 import { SearchIcon, ArrowForwardIcon } from "@chakra-ui/icons";
-import { BadgeIndianRupee, Heart, House, Map, Package, ShoppingCart, Truck } from "lucide-react";
+import {
+  BadgeIndianRupee,
+  Heart,
+  House,
+  Map,
+  Package,
+  ShoppingCart,
+  Truck,
+} from "lucide-react";
 
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const route = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -26,6 +41,12 @@ const Navbar = () => {
 
   const handleChange = (e) => {
     setSearchQuery(e.target.value);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+    route.push("/");
   };
 
   return (
@@ -59,18 +80,14 @@ const Navbar = () => {
           className="text-neutral-800 flex px-2 py-1 space-x-2 items-center justify-between hover:bg-neutral-200 hover:shadow-sm rounded-md transition-all ease-in-out"
         >
           <Map size={16} strokeWidth={1.2} absoluteStrokeWidth />
-          <span>
-            Address
-          </span>
+          <span>Address</span>
         </Link>
         <Link
           href="/payment"
           className="text-neutral-800 flex px-2 py-1 space-x-2 items-center justify-between hover:bg-neutral-200 hover:shadow-sm rounded-md transition-all ease-in-out"
         >
           <BadgeIndianRupee size={16} strokeWidth={1.2} absoluteStrokeWidth />
-          <span>
-            Payment
-          </span>
+          <span>Payment</span>
         </Link>
       </div>
       <div className="p-5 w-2/5 flex justify-between items-center">
@@ -90,7 +107,13 @@ const Navbar = () => {
               style={{ backgroundColor: "transparent" }}
               onClick={handleSearch}
             >
-              <SearchIcon sx={{ color: "gray" }} _hover={{ color: "gray.600", transition: "color 0.2s ease-in-out" }} />
+              <SearchIcon
+                sx={{ color: "gray" }}
+                _hover={{
+                  color: "gray.600",
+                  transition: "color 0.2s ease-in-out",
+                }}
+              />
             </Button>
           </InputRightElement>
         </InputGroup>
@@ -101,7 +124,7 @@ const Navbar = () => {
             className="border-none"
             border={0}
             icon={<Heart size={16} strokeWidth={1.2} absoluteStrokeWidth />}
-            onClick={() => { }}
+            onClick={() => {}}
           />
         </Link>
         <Link href="/cart">
@@ -123,15 +146,25 @@ const Navbar = () => {
             icon={<Truck size={16} strokeWidth={1.2} absoluteStrokeWidth />}
           />
         </Link>
-        <Link href="/signup">
-          <Button
-            rightIcon={<ArrowForwardIcon />}
-            colorScheme="gray"
-            variant="outline"
-          >
-            Login / Register
-          </Button>
-        </Link>
+
+        {isLoggedIn ? (
+          <div className="flex items-center space-x-2">
+            <Profile />
+            <Button colorScheme="gray" variant="outline" onClick={handleLogout}>
+              Logout
+            </Button>
+          </div>
+        ) : (
+          <Link href="/signup">
+            <Button
+              rightIcon={<ArrowForwardIcon />}
+              colorScheme="gray"
+              variant="outline"
+            >
+              Login / Register
+            </Button>
+          </Link>
+        )}
       </div>
     </div>
   );
