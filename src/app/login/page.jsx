@@ -45,7 +45,10 @@ const Login = () => {
     setValues((prev) => ({
       ...prev,
       [name]: value,
-      emailError: name === "email" && !isValidEmail(value) ? "Invalid email address" : undefined,
+      emailError:
+        name === "email" && !isValidEmail(value)
+          ? "Invalid email address"
+          : undefined,
     }));
   };
 
@@ -62,6 +65,9 @@ const Login = () => {
       const response = await axios.post("/api/users/login", values);
       setIsLoading(false);
       if (response.status === 200) {
+        const { token } = response.data;
+        localStorage.setItem("token", token);
+
         toast({
           title: "Login Successful",
           description: "Welcome back!",
@@ -97,7 +103,11 @@ const Login = () => {
           </Stack>
           <form onSubmit={onSubmit}>
             <Stack spacing={4}>
-              <FormControl id="email" isRequired isInvalid={touched.email && !!values.emailError}>
+              <FormControl
+                id="email"
+                isRequired
+                isInvalid={touched.email && !!values.emailError}
+              >
                 <FormLabel htmlFor="email">Email Address</FormLabel>
                 <Input
                   id="email"
@@ -164,9 +174,16 @@ const Login = () => {
             <Flex pt={4} mx="auto" justify="center">
               <Text as="span" display="flex" alignItems="center">
                 New user?
-                <Link href="/signup" className="flex items-center text-blue-600 group mx-1 border-b border-transparent hover:border-blue-600 transition-all ease-in-out">
+                <Link
+                  href="/signup"
+                  className="flex items-center text-blue-600 group mx-1 border-b border-transparent hover:border-blue-600 transition-all ease-in-out"
+                >
                   <span className="mr-1">Sign up</span>
-                  <CircleArrowUp size={16} strokeWidth={1.2} className="rotate-45 group-hover:rotate-90 transition-all ease-in-out" />
+                  <CircleArrowUp
+                    size={16}
+                    strokeWidth={1.2}
+                    className="rotate-45 group-hover:rotate-90 transition-all ease-in-out"
+                  />
                 </Link>
               </Text>
             </Flex>
