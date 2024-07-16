@@ -22,6 +22,8 @@ import axios from "axios";
 import Link from "next/link";
 import { CircleArrowUp, Loader, MoveRight } from "lucide-react";
 import { useToast } from "@chakra-ui/react";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "../../redux/slices/userSlice";
 
 const initialValues = {
   email: "",
@@ -33,6 +35,7 @@ const Login = () => {
   const [values, setValues] = useState(initialValues);
   const [touched, setTouched] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
   const toast = useToast();
   const router = useRouter();
 
@@ -65,8 +68,9 @@ const Login = () => {
       const response = await axios.post("/api/users/login", values);
       setIsLoading(false);
       if (response.status === 200) {
-        const { token } = response.data;
+        const { token, user } = response.data;
         localStorage.setItem("token", token);
+        dispatch(loginSuccess({ token, user }));
 
         toast({
           title: "Login Successful",

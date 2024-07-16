@@ -22,15 +22,17 @@ import {
   ShoppingCart,
   Truck,
 } from "lucide-react";
+import { logout } from "../../redux/slices/userSlice";
+import { useDispatch } from "react-redux";
 
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isAuthenticated, user } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   const route = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
   }, []);
 
   const handleSearch = (e) => {
@@ -45,7 +47,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    setIsLoggedIn(false);
+    dispatch(logout());
     route.push("/");
   };
 
@@ -124,7 +126,7 @@ const Navbar = () => {
             className="border-none"
             border={0}
             icon={<Heart size={16} strokeWidth={1.2} absoluteStrokeWidth />}
-            onClick={() => {}}
+            onClick={() => { }}
           />
         </Link>
         <Link href="/cart">
@@ -147,7 +149,7 @@ const Navbar = () => {
           />
         </Link>
 
-        {isLoggedIn ? (
+        {isAuthenticated ? (
           <div className="flex items-center space-x-2">
             <Profile />
             <Button colorScheme="gray" variant="outline" onClick={handleLogout}>
