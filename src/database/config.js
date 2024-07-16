@@ -3,7 +3,6 @@ import "dotenv/config";
 
 const Connection = async () => {
     const MongoDb_URI = process.env.MONGODB_URI;
-    console.log("MongoDb_URI:", MongoDb_URI);
 
     if (!MongoDb_URI) {
         throw new Error("MONGODB_URI environment variable is not set");
