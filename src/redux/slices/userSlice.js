@@ -2,8 +2,8 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const initialState = {
     isAuthenticated: false,
-    user: null,
-    token: null,
+    user: "",
+    token: "",
 };
 
 const userSlice = createSlice({
@@ -17,8 +17,8 @@ const userSlice = createSlice({
         },
         logout: (state) => {
             state.isAuthenticated = false;
-            state.user = null;
-            state.token = null;
+            state.user = "";
+            state.token = "";
         },
     },
 });

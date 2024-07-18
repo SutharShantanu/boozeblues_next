@@ -1,11 +1,11 @@
 import React from "react";
 import Avvvatars from "avvvatars-react";
 
-const Profile = () => {
+const Profile = ({ email, style }) => {
   return (
     <React.Fragment>
       <div>
-        <Avvvatars value="best_user@gmail.com" style="character" />
+        <Avvvatars value={email} style={style} />
       </div>
     </React.Fragment>
   );

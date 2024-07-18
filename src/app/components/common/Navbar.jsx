@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Profile from "../components/common/profile";
+import Profile from "../../components/common/profile"
 
 import {
   Button,
@@ -22,12 +22,15 @@ import {
   ShoppingCart,
   Truck,
 } from "lucide-react";
-import { logout } from "../../redux/slices/userSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { isAuthenticated, user } = useSelector((state) => state.user);
+  const data = useSelector((state) => state.user);
+
+  console.log(isAuthenticated);
+
   const dispatch = useDispatch();
   const route = useRouter();
 
@@ -149,14 +152,14 @@ const Navbar = () => {
           />
         </Link>
 
-        {isAuthenticated ? (
-          <div className="flex items-center space-x-2">
+        {/* {isAuthenticated ? ( */}
+          {/* <div className="flex items-center space-x-2">
             <Profile />
             <Button colorScheme="gray" variant="outline" onClick={handleLogout}>
               Logout
             </Button>
-          </div>
-        ) : (
+          </div> */}
+        {/* ) : ( */}
           <Link href="/signup">
             <Button
               rightIcon={<ArrowForwardIcon />}
@@ -166,7 +169,7 @@ const Navbar = () => {
               Login / Register
             </Button>
           </Link>
-        )}
+        {/* )} */}
       </div>
     </div>
   );
