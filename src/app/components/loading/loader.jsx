@@ -1,11 +1,12 @@
+import { Loader } from 'lucide-react';
 import React from 'react';
 
 
 const loader = () => {
     return (
         <React.Fragment>
-            <div >
-
+            <div className='bg-red-300'>
+            <Loader size={16} strokeWidth={1.2} absoluteStrokeWidth />
             </div>
         </React.Fragment >
     )

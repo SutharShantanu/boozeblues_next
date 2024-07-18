@@ -1,8 +1,8 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    isAuthenticated: false,
-    user: "",
+    fullName: "",
+    email: "",
     token: "",
 };
 
@@ -11,13 +11,13 @@ const userSlice = createSlice({
     initialState,
     reducers: {
         loginSuccess: (state, action) => {
-            state.isAuthenticated = true;
-            state.user = action.payload.user;
+            state.fullName = action.payload.fullName;
+            state.email = action.payload.email;
             state.token = action.payload.token;
         },
         logout: (state) => {
-            state.isAuthenticated = false;
-            state.user = "";
+            state.fullName = "";
+            state.email = "";
             state.token = "";
         },
     },

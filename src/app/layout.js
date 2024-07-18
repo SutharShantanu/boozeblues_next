@@ -3,7 +3,9 @@ import "./globals.css";
 import { ChakraProvider } from "@chakra-ui/react";
 import Providers from "../redux/Provider";
 import Navbar from "./components/common/Navbar";
+import { Suspense } from "react";
 const inter = Inter({ subsets: ["latin"] });
+import loader from "../app/components/loading/loader"
 
 export const metadata = {
     title: "Create Next App",
@@ -13,18 +15,20 @@ export const metadata = {
 export default function RootLayout({ children }) {
     return (
         <html lang="en">
-            <Providers>
-                <ChakraProvider>
-                    <div className="borde-2 border-red-500">
-                        <Navbar />
-                        <body className={`${inter.className} mt-[82px]`}>
-                            {/* <div className="min-h-[91vh] border-4 border-yellow-800"> */}
-                            {children}
-                            {/* </div> */}
-                        </body>
-                    </div>
-                </ChakraProvider>
-            </Providers>
+            <Suspense fallback={<loader />}>
+                <Providers>
+                    <ChakraProvider>
+                        <div className="borde-2 border-red-500">
+                            <Navbar />
+                            <body className={`${inter.className} mt-[82px]`}>
+                                {/* <div className="min-h-[91vh] border-4 border-yellow-800"> */}
+                                {children}
+                                {/* </div> */}
+                            </body>
+                        </div>
+                    </ChakraProvider>
+                </Providers>
+            </Suspense>
         </html>
     );
 }

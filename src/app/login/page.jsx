@@ -68,10 +68,9 @@ const Login = () => {
       const response = await axios.post("/api/users/login", values);
       setIsLoading(false);
       if (response.status === 200) {
-        const { token, email } = response.data;
+        const { token, email, fullName } = response.data;
         localStorage.setItem("token", token);
-        console.log(response);
-        dispatch(loginSuccess({ token, user: email }));
+        dispatch(loginSuccess({ token, email, fullName }));
 
         toast({
           title: "Login Successful",

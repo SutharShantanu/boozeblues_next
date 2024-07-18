@@ -23,24 +23,30 @@ import {
   Truck,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
+import { loginSuccess, logout } from "../../../redux/slices/userSlice";
 
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { isAuthenticated, user } = useSelector((state) => state.user);
-  const data = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const router = useRouter();
 
+  const { token } = useSelector((state) => state.user) || localStorage.getItem("token");
+  const isAuthenticated = Boolean(token);
   console.log(isAuthenticated);
 
-  const dispatch = useDispatch();
-  const route = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-  }, []);
+    const storedToken = localStorage.getItem("token");
+    const storedEmail = localStorage.getItem("email");
+
+    if (storedToken && storedEmail) {
+      dispatch(loginSuccess({ token: storedToken, email: storedEmail }));
+    }
+  }, [dispatch]);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    route(`/search?query=${searchQuery}`);
+    router.push(`/search?query=${searchQuery}`);
     setSearchQuery("");
   };
 
@@ -50,8 +56,9 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("email");
     dispatch(logout());
-    route.push("/");
+    router.push("/");
   };
 
   return (
@@ -152,15 +159,12 @@ const Navbar = () => {
           />
         </Link>
 
-        {/* {isAuthenticated ? ( */}
-          {/* <div className="flex items-center space-x-2">
-            <Profile />
-            <Button colorScheme="gray" variant="outline" onClick={handleLogout}>
-              Logout
-            </Button>
-          </div> */}
-        {/* ) : ( */}
-          <Link href="/signup">
+        {isAuthenticated ? (
+          <div className="flex items-center space-x-2">
+            <Profile onClick={handleLogout} />
+          </div>
+        ) : (
+          <Link href="/login">
             <Button
               rightIcon={<ArrowForwardIcon />}
               colorScheme="gray"
@@ -169,7 +173,7 @@ const Navbar = () => {
               Login / Register
             </Button>
           </Link>
-        {/* )} */}
+        )}
       </div>
     </div>
   );
