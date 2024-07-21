@@ -70,6 +70,8 @@ const Login = () => {
       if (response.status === 200) {
         const { token, email, fullName } = response.data;
         localStorage.setItem("token", token);
+        localStorage.setItem("email", email);
+        localStorage.setItem("fullName", fullName);
         dispatch(loginSuccess({ token, email, fullName }));
 
         toast({
@@ -96,7 +98,7 @@ const Login = () => {
   };
 
   return (
-    <Flex minH="100vh" align="center" justify="center" bg="gray.50">
+    <Flex align="center" justify="center" bg="gray.50">
       <Box bg="white" p={8} borderRadius="lg" boxShadow="lg" w="full" maxW="lg">
         <Stack spacing={4}>
           <Stack align="center">
