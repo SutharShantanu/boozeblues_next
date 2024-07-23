@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Profile from "../../components/common/profile"
 import Light_Logo from "../../../assets/4.png";
-// import Address from "../../components/common/Address"
+import Address from "../../components/common/Address"
 
 import {
   Button,
@@ -62,9 +62,9 @@ const Navbar = () => {
   };
 
   const handleLogout = async () => {
-     localStorage.removeItem("token");
-     localStorage.removeItem("email");
-     localStorage.removeItem("fullName");
+    localStorage.removeItem("token");
+    localStorage.removeItem("email");
+    localStorage.removeItem("fullName");
     dispatch(logout());
     toast({
       title: "Logged out successfully.",
@@ -234,7 +234,7 @@ const Navbar = () => {
             </Link>
           </div>
           <div className="p-5">
-            {/* <Address email={storedEmail} /> */}
+            <Address />
           </div>
         </div>
       </div>
