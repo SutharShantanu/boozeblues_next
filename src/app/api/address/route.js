@@ -3,16 +3,18 @@ import User from "../../../models/user";
 
 export const POST = async (NextRequest, NextResponse) => {
     await Connection();
-    const body = await NextRequest.json();
-    const { email, address } = body;
 
     try {
-        if (!email || !address) {
-            return new Response("Email and address are required", {
+        const body = await NextRequest.json();
+        const { user_id, address } = body;
+
+        if (!user_id || !address) {
+            return new Response("User ID and address are required", {
                 status: 400,
             });
         }
-        const user = await User.findOne({ email });
+
+        const user = await User.findById(user_id);
 
         if (!user) {
             return new Response("User not found", { status: 404 });
@@ -31,16 +33,21 @@ export const POST = async (NextRequest, NextResponse) => {
 
 export const GET = async (NextRequest, NextResponse) => {
     await Connection();
-    const { email } = NextRequest.query;
 
     try {
-        if (!email) {
-            return new Response("Email is required", {
+        const body = await NextRequest.json();
+        const { user_id } = body;
+
+        console.log(user_id);
+        
+
+        if (!user_id) {
+            return new Response("User ID is required", {
                 status: 400,
             });
         }
 
-        const user = await User.findOne({ email });
+        const user = await User.findById(user_id);
 
         if (!user) {
             return new Response("User not found", { status: 404 });

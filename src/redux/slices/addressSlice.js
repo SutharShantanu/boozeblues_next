@@ -2,10 +2,12 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const addressSlice = createSlice({
     name: "address",
-    initialState: "",
+    initialState: {
+        address: "",
+    },
     reducers: {
         setAddress: (state, action) => {
-            return { ...state, ...action.payload };
+            state.address = action.payload.address;
         },
     },
 });

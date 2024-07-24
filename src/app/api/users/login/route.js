@@ -28,10 +28,10 @@ export const POST = async (NextRequest, NextResponse) => {
             expiresIn: "1h",
         });
 
-        const fullName = user.fullName;
+        const user_id = user._id;
 
         return new Response(
-            JSON.stringify({ message: "Login successful", token, email, fullName }),
+            JSON.stringify({ message: "Login successful", token, user_id }),
             {
                 status: 200,
                 headers: {

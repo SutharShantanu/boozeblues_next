@@ -66,14 +66,13 @@ const Login = () => {
 
     try {
       const response = await axios.post("/api/users/login", values);
-      setIsLoading(false);
       if (response.status === 200) {
-        const { token, email, fullName } = response.data;
+        const { token, user_id } = response.data;
         localStorage.setItem("token", token);
-        localStorage.setItem("email", email);
-        localStorage.setItem("fullName", fullName);
-        dispatch(loginSuccess({ token, email, fullName }));
 
+        dispatch(loginSuccess({ token, user_id }));
+
+        setIsLoading(false);
         toast({
           title: "Login Successful",
           description: "Welcome back!",
@@ -82,7 +81,8 @@ const Login = () => {
           isClosable: true,
           position: "bottom-right",
         });
-        // router.push("/");
+
+        router.push("/");
       }
     } catch (error) {
       setIsLoading(false);

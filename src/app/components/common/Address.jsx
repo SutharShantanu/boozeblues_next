@@ -12,149 +12,75 @@ const initialValues = {
     pin: "",
 };
 
-const Address = ({ email }) => {
+const Address = () => {
     const dispatch = useDispatch();
-    const address = useSelector((state) => state.address);
+    const user_id = useSelector((state) => state.user.user_id);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [values, setValues] = useState(initialValues);
-    const [touched, setTouched] = useState({});
     const [errors, setErrors] = useState({});
-    const [isLoading, setIsLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
     const toast = useToast();
 
-    // useEffect(() => {
-    //     const fetchAddress = async () => {
-    //         try {
-    //             const response = await axios.get(`/api/address?email=${email}`);
-    //             if (response.status === 200) {
-    //                 console.log(response.data);
-    //                 const addressData = response.data.address;
-    //                 const [flatRoomNo, buildingName, landmark, cityPin] = addressData.split(", ");
-    //                 const [city, pin] = cityPin ? cityPin.split(" - ") : ["", ""];
-    //                 setValues({ flatRoomNo, buildingName, landmark, city, pin });
-    //             }
-    //         } catch (error) {
-    //             console.error('Failed to fetch address:', error);
-    //             toast({
-    //                 title: "Fetch Failed",
-    //                 description: `An error occurred while fetching your address. ${error}`,
-    //                 status: "error",
-    //                 position: "bottom-right",
-    //                 duration: 3000,
-    //                 isClosable: true,
-    //             });
-    //         }
-    //     };
+    const [isLoading, setIsLoading] = useState(false);
+    const [token, setToken] = useState("");
+    const [addressFetched, setAddressFetched] = useState("");
 
-    //     fetchAddress();
-    // }, [email, toast]);
-
+    useEffect(() => {
+        // Fetch current address from server if necessary
+        const fetchAddress = async () => {
+            if (user_id) {
+                try {
+                    const response = await axios.get(`/api/address/`, {
+                        headers: {
+                            Authorization: Bearer ${token},
+                            'Content-Type': 'application/json',
+                        },
+                        data: { user_id },
+                    });
+                    setValues(response.data);
+                } catch (error) {
+                    console.error("Failed to fetch address:", error);
+                }
+            }
+        };
+        fetchAddress();
+    }, [user_id]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-
-        const formattedValue = name !== 'pin' ? value.charAt(0).toUpperCase() + value.slice(1) : value;
-
-        if (name === "pin" && (value.length > 6 || !/^\d*$/.test(value))) {
-            setErrors((prev) => ({
-                ...prev,
-                pin: value.length > 6 ? "Pin code must be 6 digits." : "Invalid Pin",
-            }));
-            return;
-        } else {
-            setErrors((prev) => ({
-                ...prev,
-                pin: undefined,
-            }));
-        }
-
-        setValues(prevValues => ({
-            ...prevValues,
-            [name]: formattedValue,
-        }));
-    };
-
-    const handleBlur = (e) => {
-        const { name } = e.target;
-        setTouched((prev) => ({ ...prev, [name]: true }));
-
-        if (name === "pin" && values.pin.length !== 6) {
-            setErrors((prev) => ({
-                ...prev,
-                pin: "Pin code must be 6 digits.",
-            }));
-        } else {
-            setErrors((prev) => ({
-                ...prev,
-                pin: undefined,
-            }));
-        }
+        setValues({
+            ...values,
+            [name]: value,
+        });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsLoading(true);
-
-        if (!values.flatRoomNo || !values.buildingName || !values.city) {
-            toast({
-                title: "Missing Information",
-                description: "Please ensure that House No, Apartment, and City fields are filled.",
-                status: "error",
-                duration: 3000,
-                isClosable: true,
-            });
-            setIsLoading(false);
-            return;
-        }
-
-        if (values.pin.length !== 6) {
-            toast({
-                title: "Invalid Pin Code",
-                description: "The pin code must be 6 digits long. Please correct it and try again.",
-                status: "error",
-                duration: 3000,
-                isClosable: true,
-            });
-            setIsLoading(false);
-            return;
-        }
-
-        const addressString = `${values.flatRoomNo || ""}${values.flatRoomNo && values.buildingName ? ", " : ""}${values.buildingName || ""}${values.buildingName && values.landmark ? ", " : ""}${values.landmark || ""}${(values.landmark || values.buildingName || values.flatRoomNo) && values.city ? ", " : ""}${values.city || ""}${values.city && values.pin ? " - " : ""}${values.pin || ""}`;
-
-        const addressData = JSON.stringify({
-            email,
-            address: addressString,
-        });
+        setLoading(true);
         try {
-            const response = await axios.post('/api/address', addressData);
-
-            if (response.status == 200) {
-                console.log(response.data);
-                toast({
-                    title: "Address Updated",
-                    description: "Your delivery address has been successfully updated.",
-                    status: "success",
-                    position: "bottom-right",
-                    duration: 3000,
-                    isClosable: true,
-                });
-                onClose();
-            }
-        } catch (error) {
-            console.error('Failed to update address:', error);
+            await axios.post(`/api/address/${user_id}`, values);
+            dispatch(setAddress(values));
             toast({
-                title: "Update Failed",
-                description: "An error occurred while updating your address. Please try again later.",
+                title: "Address updated.",
+                description: "Your address has been updated successfully.",
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+            });
+            onClose();
+        } catch (error) {
+            console.error("Failed to update address:", error);
+            toast({
+                title: "Update failed.",
+                description: "There was an issue updating your address. Please try again.",
                 status: "error",
-                position: "bottom-right",
-                duration: 3000,
+                duration: 5000,
                 isClosable: true,
             });
         } finally {
-            setIsLoading(false);
+            setLoading(false);
         }
     };
-
 
     const addressString = `${values.flatRoomNo || ""}${values.flatRoomNo && values.buildingName ? ", " : ""}${values.buildingName || ""}${values.buildingName && values.landmark ? ", " : ""}${values.landmark || ""}${(values.landmark || values.buildingName || values.flatRoomNo) && values.city ? ", " : ""}${values.city || ""}${values.city && values.pin ? " - " : ""}${values.pin || ""}`;
 
@@ -272,9 +198,8 @@ const Address = ({ email }) => {
                                 >
                                     <FormLabel htmlFor="pin">Pin Code</FormLabel>
                                     <Input
-                                        id="pin"
                                         name="pin"
-                                        type="text"
+                                        id="pin"
                                         fontSize="small"
                                         rounded={"none"}
                                         className="!shadow-none"
@@ -284,70 +209,43 @@ const Address = ({ email }) => {
                                         value={values.pin}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
+                                        maxLength={6}
                                     />
-                                    {touched.pin && (errors.pin || !values.pin) && (
+                                    {touched.pin && errors.pin && (
                                         <FormErrorMessage fontSize={"small"}>{errors.pin}</FormErrorMessage>
                                     )}
                                 </FormControl>
                             </SimpleGrid>
-                            <Flex align="center" gap="2" mt={4}>
+                            <Flex direction={"column"} alignItems={"center"} justifyContent={"center"} mt={8}>
                                 <Button
-                                    type="submit"
-                                    bg={"gray.900"}
-                                    color={"gray.50"}
-                                    rounded={"none"}
-                                    w={"full"}
-                                    _hover={{
-                                        bg: "gray.800",
-                                    }}
-                                    py={"0"}
+                                    leftIcon={isLoading ? <Loader className='animate-spin' size={16} /> : <CircleCheck size={16} />}
                                     isLoading={isLoading}
-                                    loadingText="Saving Address"
-                                    className="group"
+                                    loadingText='Saving'
+                                    type='submit'
+                                    w={"full"}
+                                    size={"sm"}
+                                    rounded={"none"}
+                                    className="shadow-none !ring-0"
+                                    colorScheme='gray'
+                                    variant={"solid"}
                                 >
-                                    {isLoading ? (
-                                        <Loader size={16} strokeWidth={1.2} />
-                                    ) : (
-                                        <Flex alignItems={"center"}>
-                                            <Text fontSize="smaller">
-                                                Save Address
-                                            </Text>
-                                            <CircleCheck
-                                                size={16}
-                                                strokeWidth={1.5}
-                                                className="transition-all duration-300 ease-in-out w-0 group-hover:w-5 ml-2"
-                                            />
-                                        </Flex>
-                                    )}
+                                    Save Address
                                 </Button>
                             </Flex>
                         </form>
                     </ModalBody>
                     <ModalFooter>
-                        <Text mt={2} fontSize="xs" noOfLines={1}>
-                            {addressString || "Your address preview will display here."}
-                        </Text>
+                        <Text textAlign={"center"} fontSize={"small"}>Entered Wrong Address? <Button fontSize={"small"} onClick={() => setValues(initialValues)} size={"small"} variant="link" colorScheme='blue'>Clear Form</Button></Text>
                     </ModalFooter>
                 </ModalContent>
             </Modal>
-
-            <Flex
-                cursor="pointer"
-                direction="column"
-                onClick={onOpen}
-                px={2}
-                py={"2px"}
-                bg="gray.900"
-                color="gray.50"
-                rounded="none"
-                borderColor="gray.800"
-            >
-                <Flex align="center" gap="2">
-                    <MapPin size={16} absoluteStrokeWidth strokeWidth={1.5} />
-                    <Text fontSize="sm">Update Address</Text>
-                </Flex>
-
-            </Flex>
+            <div onClick={onOpen} className="px-6 py-3 bg-gray-50 border border-gray-200 rounded-sm flex items-center justify-between cursor-pointer">
+                <div className="flex items-center gap-2">
+                    <MapPin size={20} />
+                    <Text as="span" fontSize="small">{addressFetched || "Add Delivery Address"}</Text>
+                </div>
+                <Button size="sm" rounded="none" className="shadow-none !ring-0" colorScheme="blue" variant="outline">Edit</Button>
+            </div>
         </div>
     );
 };

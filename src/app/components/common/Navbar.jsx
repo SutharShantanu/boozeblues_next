@@ -33,23 +33,22 @@ import Image from "next/image";
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [storedToken, setStoredToken] = useState("");
-  const [storedEmail, setStoredEmail] = useState("");
-  const [storedName, setStoredName] = useState("");
   const dispatch = useDispatch();
   const router = useRouter();
 
-  const { token } = useSelector((state) => state.user) || localStorage.getItem("token");
+  const data = useSelector((state) => console.log(state)
+  )
+
+  const { token } = useSelector((state) => state.user.token) || localStorage.getItem("token");
   const isAuthenticated = Boolean(token);
 
   useEffect(() => {
     setStoredToken(localStorage.getItem("token"))
-    setStoredEmail(localStorage.getItem("email"))
-    setStoredName(localStorage.getItem("fullName"))
 
-    if (storedToken && storedEmail) {
-      dispatch(loginSuccess({ token: storedToken, email: storedEmail, fullName: storedName }));
+    if (storedToken) {
+      dispatch(loginSuccess({ token: storedToken, }));
     }
-  }, [dispatch, storedToken, storedEmail, storedName]);
+  }, [dispatch, storedToken]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -77,7 +76,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="fixed w-full top-0 z-[999] bg-gray-50 shadow-md">
+    <div className="fixed w-full top-0 z-[999] bg-white shadow-md">
 
       <div className=" flex items-center justify-between w-11/12 mx-auto p-5">
         <Link href="/" className="group">
