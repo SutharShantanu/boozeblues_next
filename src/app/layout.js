@@ -2,6 +2,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ChakraProvider } from "@chakra-ui/react";
 import Navbar from "./components/common/Navbar";
+import Footer from "./components/common/Footer"
 import Providers from "../redux/Provider";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -20,6 +21,7 @@ export default function RootLayout({ children }) {
                         <Navbar />
                         <div className="border-2 border-red-500">
                             {children}
+                            <Footer />
                         </div>
                     </Providers>
                 </ChakraProvider>
