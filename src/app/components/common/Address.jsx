@@ -17,6 +17,7 @@ const Address = () => {
     const user_id = useSelector((state) => state.user.user_id);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [values, setValues] = useState(initialValues);
+    const [touched, setTouched] = useState({});
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const toast = useToast();
@@ -26,45 +27,85 @@ const Address = () => {
     const [addressFetched, setAddressFetched] = useState("");
 
     useEffect(() => {
-        // Fetch current address from server if necessary
         const fetchAddress = async () => {
             if (user_id) {
                 try {
                     const response = await axios.get(`/api/address/`, {
                         headers: {
-                            Authorization: Bearer ${token},
+                            Authorization: `Bearer ${token}`,
                             'Content-Type': 'application/json',
                         },
                         data: { user_id },
                     });
-                    setValues(response.data);
+                    console.log(response.data);
+                    setAddressFetched(response.data.address);
                 } catch (error) {
                     console.error("Failed to fetch address:", error);
                 }
             }
         };
         fetchAddress();
-    }, [user_id]);
+    }, [user_id, token]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setValues({
-            ...values,
-            [name]: value,
-        });
+
+        const formattedValue = name !== 'pin' ? value.charAt(0).toUpperCase() + value.slice(1) : value;
+
+        if (name === "pin" && (value.length > 6 || !/^\d*$/.test(value))) {
+            setErrors((prev) => ({
+                ...prev,
+                pin: value.length > 6 ? "Pin code must be 6 digits." : "Invalid Pin",
+            }));
+            return;
+        } else {
+            setErrors((prev) => ({
+                ...prev,
+                pin: undefined,
+            }));
+        }
+
+        setValues(prevValues => ({
+            ...prevValues,
+            [name]: formattedValue,
+        }));
+    };
+
+
+    const handleBlur = (e) => {
+        const { name } = e.target;
+        setTouched((prev) => ({ ...prev, [name]: true }));
+
+        if (name === "pin" && values.pin.length !== 6) {
+            setErrors((prev) => ({
+                ...prev,
+                pin: "Pin code must be 6 digits.",
+            }));
+        } else {
+            setErrors((prev) => ({
+                ...prev,
+                pin: undefined,
+            }));
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         try {
-            await axios.post(`/api/address/${user_id}`, values);
+            await axios.post(`/api/address/`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                data: { user_id, address: values },
+            });
             dispatch(setAddress(values));
             toast({
                 title: "Address updated.",
                 description: "Your address has been updated successfully.",
                 status: "success",
-                duration: 5000,
+                duration: 3000,
                 isClosable: true,
             });
             onClose();
@@ -74,13 +115,14 @@ const Address = () => {
                 title: "Update failed.",
                 description: "There was an issue updating your address. Please try again.",
                 status: "error",
-                duration: 5000,
+                duration: 3000,
                 isClosable: true,
             });
         } finally {
             setLoading(false);
         }
     };
+
 
     const addressString = `${values.flatRoomNo || ""}${values.flatRoomNo && values.buildingName ? ", " : ""}${values.buildingName || ""}${values.buildingName && values.landmark ? ", " : ""}${values.landmark || ""}${(values.landmark || values.buildingName || values.flatRoomNo) && values.city ? ", " : ""}${values.city || ""}${values.city && values.pin ? " - " : ""}${values.pin || ""}`;
 

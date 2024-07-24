@@ -39,7 +39,7 @@ const Navbar = () => {
   const data = useSelector((state) => console.log(state)
   )
 
-  const { token } = useSelector((state) => state.user.token) || localStorage.getItem("token");
+  const token = useSelector((state) => state.user.token) || localStorage.getItem('token');
   const isAuthenticated = Boolean(token);
 
   useEffect(() => {
@@ -161,7 +161,7 @@ const Navbar = () => {
 
           {isAuthenticated ? (
             <div className="flex items-center space-x-2">
-              <Profile onClick={handleLogout} email={storedEmail} fullName={storedName} />
+              <Profile onClick={handleLogout} />
             </div>
           ) : (
             <div className=" flex items-center justify-between px-3">

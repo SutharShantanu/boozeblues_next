@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Avatar,
   Menu,
@@ -13,9 +13,34 @@ import {
   Box,
 } from "@chakra-ui/react";
 import { BadgeIndianRupee, CircleHelp, CircleUserRound, Heart, HeartHandshake, LogOut, Map, Truck } from "lucide-react";
+import { useSelector } from "react-redux";
+import axios from 'axios';
 
-const Profile = ({ onClick, email, fullName }) => {
-  
+const Profile = ({ onClick }) => {
+  const userId = useSelector(state => state.user.user_id);
+  console.log("userId", userId)
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(`/api/user/profile`, {
+          headers: { 'user_id': userId }
+        });
+        setUserData(response.data.userData);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    if (userId) {
+      fetchUserData();
+    }
+  }, [userId]);
+
+  if (!userData) return null;
+
+  const { fullName, email } = userData;
 
   return (
     <Menu>

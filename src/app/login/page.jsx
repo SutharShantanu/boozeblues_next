@@ -22,7 +22,7 @@ import axios from "axios";
 import Link from "next/link";
 import { CircleArrowUp, Loader, MoveRight } from "lucide-react";
 import { useToast } from "@chakra-ui/react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { loginSuccess } from "../../redux/slices/userSlice";
 
 const initialValues = {
@@ -69,9 +69,9 @@ const Login = () => {
       if (response.status === 200) {
         const { token, user_id } = response.data;
         localStorage.setItem("token", token);
-
         dispatch(loginSuccess({ token, user_id }));
-
+        const ReduxData = useSelector((state) => state);
+        console.log(response.data, ReduxData)
         setIsLoading(false);
         toast({
           title: "Login Successful",
