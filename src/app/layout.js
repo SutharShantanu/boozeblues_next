@@ -2,9 +2,9 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ChakraProvider } from "@chakra-ui/react";
 import Navbar from "./components/common/Navbar";
-import Footer from "./components/common/Footer"
+import Footer from "./components/common/Footer";
 import Providers from "../redux/Provider";
-
+import { SessionProvider } from "next-auth/react"
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -16,15 +16,17 @@ export default function RootLayout({ children }) {
     return (
         <html lang="en">
             <body className={`${inter.className} mt-[82px]`}>
-                <ChakraProvider>
-                    <Providers>
-                        <Navbar />
-                        <div className="border-2 border-red-500">
-                            {children}
-                            <Footer />
-                        </div>
-                    </Providers>
-                </ChakraProvider>
+                <SessionProvider session={session}>
+                    <ChakraProvider>
+                        <Providers>
+                            <Navbar />
+                            <div className="border-2 border-red-500">
+                                {children}
+                                <Footer />
+                            </div>
+                        </Providers>
+                    </ChakraProvider>
+                </SessionProvider>
             </body>
         </html>
     );

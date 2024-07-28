@@ -29,8 +29,10 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { loginSuccess, logout } from "../../../redux/slices/userSlice";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 const Navbar = () => {
+  const { data: session } = useSession()
   const [searchQuery, setSearchQuery] = useState("");
   const [storedToken, setStoredToken] = useState("");
   const dispatch = useDispatch();
@@ -159,7 +161,7 @@ const Navbar = () => {
             </Link>
           </Tooltip>
 
-          {isAuthenticated ? (
+          {session ? (
             <div className="flex items-center space-x-2">
               <Profile onClick={handleLogout} />
             </div>

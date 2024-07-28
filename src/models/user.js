@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
+        unique: true,
     },
     password: {
         type: String,
@@ -27,10 +28,34 @@ const userSchema = new mongoose.Schema({
     },
     address: {
         type: String,
-        default: '',
+        default: "",
     },
 });
 
-const User = mongoose.models.user || mongoose.model("user", userSchema);
+const userAdminSchema = new mongoose.Schema({
+    fullName: {
+        type: String,
+        required: true,
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+    password: {
+        type: String,
+        required: true,
+    },
+    phoneNumber: {
+        type: Number,
+        required: true,
+    },
+    address: {
+        type: String,
+        default: "",
+    },
+});
 
-export default User;
+export const User = mongoose.models.User || mongoose.model("User", userSchema);
+export const Admin =
+    mongoose.models.Admin || mongoose.model("Admin", userAdminSchema);

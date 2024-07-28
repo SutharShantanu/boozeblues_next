@@ -24,6 +24,7 @@ import { CircleArrowUp, Loader, MoveRight } from "lucide-react";
 import { useToast } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { loginSuccess } from "../../redux/slices/userSlice";
+import { useSession, signIn, signOut } from "next-auth/react"
 
 const initialValues = {
   email: "",
@@ -31,6 +32,7 @@ const initialValues = {
 };
 
 const Login = () => {
+  const { data: session } = useSession()
   const [showPassword, setShowPassword] = useState(false);
   const [values, setValues] = useState(initialValues);
   const [touched, setTouched] = useState({});
@@ -67,11 +69,11 @@ const Login = () => {
     try {
       const response = await axios.post("/api/users/login", values);
       if (response.status === 200) {
-        const { token, user_id } = response.data;
+        const data = response.data;
+        console.log(data);
+
         localStorage.setItem("token", token);
-        dispatch(loginSuccess({ token, user_id }));
-        const ReduxData = useSelector((state) => state);
-        console.log(response.data, ReduxData)
+
         setIsLoading(false);
         toast({
           title: "Login Successful",
