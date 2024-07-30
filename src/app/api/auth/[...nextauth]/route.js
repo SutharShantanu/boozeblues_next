@@ -1,2 +1,2 @@
-import authHandler from "../../../../../auth";
-export const { GET, POST } = authHandler;
+import handler from "../../../../../auth";
+export const { GET, POST } = handler;

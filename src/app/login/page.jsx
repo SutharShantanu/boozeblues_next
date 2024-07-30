@@ -100,7 +100,7 @@ const Login = () => {
   };
 
   return (
-    <Flex align="center" justify="center" bg="gray.50">
+    <Flex align="center" justify="center" minH="100vh" bg="gray.50" >
       <Box bg="white" p={8} borderRadius="lg" boxShadow="lg" w="full" maxW="lg">
         <Stack spacing={4}>
           <Stack align="center">
