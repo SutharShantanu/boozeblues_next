@@ -67,12 +67,14 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post("/api/users/login", values);
+      // const response = await axios.post("/api/users/login", values);
+      const signInData = await signIn('credentials', filteredValues);
+      console.log(signInData);
       if (response.status === 200) {
-        const data = response.data;
-        console.log(data);
+        // const data = response.data;
+        // console.log(data);
 
-        localStorage.setItem("token", token);
+        // localStorage.setItem("token", token);
 
         setIsLoading(false);
         toast({

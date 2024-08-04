@@ -1,9 +1,12 @@
-import React from 'react'
+import React from 'react';
 
-const Denied = () => {
+const AccessDenied = () => {
     return (
-        <div>Denied</div>
-    )
-}
+        <div>
+            <h1>Access Denied</h1>
+            <p>You do not have permission to view this page.</p>
+        </div>
+    );
+};
 
-export default Denied;
+export default AccessDenied;

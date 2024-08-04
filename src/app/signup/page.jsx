@@ -24,6 +24,7 @@ import axios from "axios";
 import Link from "next/link";
 import { CircleArrowUp, Loader, MoveRight } from "lucide-react";
 import { useToast } from "@chakra-ui/react";
+import { signIn } from "next-auth/react";
 
 const initialValues = {
   fullName: "",
@@ -104,12 +105,13 @@ const SignUp = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    console.log(values);
 
     const { emailError, passwordError, ...filteredValues } = values;
 
     try {
-      const response = await axios.post("/api/users/signup", filteredValues);
+      // const response = await axios.post("/api/users/signup", filteredValues);
+      // const signInData = await signIn('credentials', filteredValues);
+      console.log(signInData);
       setIsLoading(false);
       setValues(initialValues);
       if (response.status === 200) {
@@ -140,7 +142,7 @@ const SignUp = () => {
   };
 
   return (
-    <Flex align="center" justify="center" bg="gray.50">
+    <Flex align="center" justify="center" minH="100vh" bg="gray.50">
       <Box bg="white" p={8} borderRadius="lg" boxShadow="lg" w="full" maxW="lg">
         <Stack spacing={4}>
           <Stack align="center">

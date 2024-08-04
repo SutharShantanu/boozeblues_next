@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
     fullName: { type: String, required: true },
@@ -23,5 +23,5 @@ const userSchema = new mongoose.Schema({
     resetPasswordExpires: Date,
 });
 
-const User = mongoose.models.User || mongoose.model("User", userSchema);
+const User = mongoose.models?.User || mongoose.model('User', userSchema);
 export default User;

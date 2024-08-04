@@ -33,16 +33,20 @@ import { useSession } from "next-auth/react";
 
 const Navbar = () => {
   const { data: session } = useSession()
+
+  useEffect(() => {
+
+  }, [session])
+
   const [searchQuery, setSearchQuery] = useState("");
   const [storedToken, setStoredToken] = useState("");
   const dispatch = useDispatch();
   const router = useRouter();
 
-  const data = useSelector((state) => console.log(state)
-  )
+  // const data = useSelector((state) => console.log(state)
+  // )
 
   const token = useSelector((state) => state.user.token) || localStorage.getItem('token');
-  const isAuthenticated = Boolean(token);
 
   useEffect(() => {
     setStoredToken(localStorage.getItem("token"))

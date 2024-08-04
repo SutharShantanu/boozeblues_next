@@ -15,28 +15,31 @@ import {
 import { BadgeIndianRupee, CircleHelp, CircleUserRound, Heart, HeartHandshake, LogOut, Map, Truck } from "lucide-react";
 import { useSelector } from "react-redux";
 import axios from 'axios';
+import { useSession } from "next-auth/react";
 
 const Profile = ({ onClick }) => {
-  const userId = useSelector(state => state.user.user_id);
-  console.log("userId", userId)
+  const { data: session } = useSession()
+
+  // const userId = useSelector(state => state.user.user_id);
+  console.log("user", session)
   const [userData, setUserData] = useState(null);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await axios.get(`/api/user/profile`, {
-          headers: { 'user_id': userId }
-        });
-        setUserData(response.data.userData);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchUserData = async () => {
+  //     try {
+  //       const response = await axios.get(`/api/user/profile`, {
+  //         headers: { 'user_id': userId }
+  //       });
+  //       setUserData(response.data.userData);
+  //     } catch (error) {
+  //       console.error('Error fetching user data:', error);
+  //     }
+  //   };
 
-    if (userId) {
-      fetchUserData();
-    }
-  }, [userId]);
+  //   if (userId) {
+  //     fetchUserData();
+  //   }
+  // }, [userId]);
 
   if (!userData) return null;
 
