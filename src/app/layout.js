@@ -6,7 +6,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import Navbar from "./components/common/Navbar";
 import Footer from "./components/common/Footer";
 import Providers from "../redux/Provider";
-import { SessionProvider } from "next-auth/react";
+import AuthProvider from "../context/AuthProvider";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -29,7 +29,7 @@ export default function RootLayout({ children, session }) {
     return (
         <html lang="en">
             <body className={`${inter.className}`}>
-                <SessionProvider session={session}>
+                <AuthProvider>
                     <ChakraProvider>
                         <Providers>
                             <div className="flex flex-col min-h-screen justify-between">
@@ -46,7 +46,7 @@ export default function RootLayout({ children, session }) {
                             </div>
                         </Providers>
                     </ChakraProvider>
-                </SessionProvider>
+                </AuthProvider>
             </body>
         </html>
     );
