@@ -1,20 +1,22 @@
-import connect from "../../../../lib/mongoDB";
+import { NextResponse } from "next/server";
+import connectDB from "../../../../lib/mongoDB";
 import User from "../../../../models/user";
-import { NextRequest, NextResponse } from "next/server";
 import bcryptjs from "bcryptjs";
-import { sendEmail } from "../../../../helpers/mailer";
 
-export async function POST(req, res) {
-    await connect();
+export const POST = async (request) => {
+    await connectDB();
+
     try {
-        const body = await req.json();
+        const body = await request.json();
+
         const { email, password } = body;
         console.log(body);
+
         const existingUser = await User.findOne({ email });
 
         if (existingUser) {
             return NextResponse.json(
-                { error: `User already exist.` },
+                { error: `User already exists.` },
                 { status: 400 }
             );
         }
@@ -27,12 +29,13 @@ export async function POST(req, res) {
         });
         const savedUser = await newUser.save();
         console.log(savedUser);
+
         // send verification email
-        await sendEmail({ email, emailType: "VERIFY", userID: savedUser._id });
+        // await sendEmail({ email, emailType: "VERIFY", userID: savedUser._id });
 
         return NextResponse.json(
             {
-                message: `User Registerd Successfully`,
+                message: `User Registered Successfully`,
                 success: true,
                 savedUser,
             },
@@ -41,4 +44,4 @@ export async function POST(req, res) {
     } catch (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
-}
+};

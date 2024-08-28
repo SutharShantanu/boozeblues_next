@@ -109,9 +109,9 @@ const SignUp = () => {
     const { emailError, passwordError, ...filteredValues } = values;
 
     try {
-      // const response = await axios.post("/api/users/signup", filteredValues);
+      const response = await axios.post("/api/user/signup", filteredValues);
       // const signInData = await signIn('credentials', filteredValues);
-      console.log(signInData);
+      console.log(response);
       setIsLoading(false);
       setValues(initialValues);
       if (response.status === 200) {
@@ -127,14 +127,15 @@ const SignUp = () => {
       }
     } catch (error) {
       setIsLoading(false);
-      toast({
-        title: "Account Creation Failed",
-        description: error.response?.data || error.message,
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-        position: "bottom-right",
-      });
+      console.log(error);
+      // toast({
+      //   title: "Account Creation Failed",
+      //   description: error.response?.data || error.message,
+      //   status: "error",
+      //   duration: 3000,
+      //   isClosable: true,
+      //   position: "bottom-right",
+      // });
       console.log(`Error from catch: ${error.message}`);
     } finally {
       setIsLoading(false);
